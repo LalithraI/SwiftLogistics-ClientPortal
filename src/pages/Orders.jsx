@@ -59,201 +59,219 @@ export default function Orders() {
   }
 
   return (
-    <section>
-      <div className="flex items-center justify-between mb-6">
-        <h2>
-          <span className="section-icon">📦</span>
-          Submit New Order
-        </h2>
-        <button 
-          type="button" 
-          onClick={generateRandomOrder}
-          className="btn btn-secondary"
-          disabled={loading}
-        >
-          🎲 Generate Sample
-        </button>
-      </div>
-
-      <form onSubmit={onSubmit} className="form">
-        <div className="grid">
-          <div className="form-group">
-            <label htmlFor="orderId">Order ID</label>
-            <input 
-              id="orderId"
-              value={orderId} 
-              onChange={e=>setOrderId(e.target.value)} 
-              required
-              placeholder="Enter unique order ID"
-            />
+    <div className="container">
+      <section className="mb-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-primary">Submit New Order</h1>
+            <p className="text-muted mt-2">Create and submit delivery orders to our logistics network</p>
           </div>
-
-          <div className="form-group">
-            <label htmlFor="address">Delivery Address</label>
-            <input 
-              id="address"
-              value={address} 
-              onChange={e=>setAddress(e.target.value)} 
-              required
-              placeholder="Full delivery address"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="latitude">Latitude</label>
-            <input 
-              id="latitude"
-              type="number" 
-              step="any" 
-              value={latitude} 
-              onChange={e=>setLat(e.target.value)} 
-              required
-              placeholder="6.9271"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="longitude">Longitude</label>
-            <input 
-              id="longitude"
-              type="number" 
-              step="any" 
-              value={longitude} 
-              onChange={e=>setLng(e.target.value)} 
-              required
-              placeholder="79.8612"
-            />
-          </div>
-
-          <div className="form-group" style={{gridColumn: '1 / -1'}}>
-            <label htmlFor="items">Package Items</label>
-            <input 
-              id="items"
-              value={items} 
-              onChange={e=>setItems(e.target.value)} 
-              placeholder="PKG001,PKG002,PKG003 (comma-separated)"
-            />
-            <div className="text-xs text-gray-500 mt-1">
-              Enter package IDs separated by commas
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4 mt-6">
-          <button 
-            type="submit" 
-            className={`btn btn-primary ${loading ? 'opacity-75' : ''}`}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="loading mr-2"></span>
-                Processing Order...
-              </>
-            ) : (
-              <>
-                🚀 Submit Order
-              </>
-            )}
-          </button>
-          
           <button 
             type="button" 
-            onClick={() => {
-              setOrderId('ORD' + Math.floor(Math.random()*1000))
-              setAddress('123 Main Street, Colombo')
-              setLat(6.9271)
-              setLng(79.8612)
-              setItems('PKG001,PKG002')
-              setResult(null)
-              setError('')
-            }}
+            onClick={generateRandomOrder}
             className="btn btn-secondary"
             disabled={loading}
           >
-            🔄 Reset Form
+            Generate Sample Data
           </button>
         </div>
-      </form>
+
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">Order Details</h3>
+          </div>
+          <div className="card-content">
+            <form onSubmit={onSubmit}>
+              <div className="grid">
+                <div className="form-group">
+                  <label className="form-label required" htmlFor="orderId">Order ID</label>
+                  <input 
+                    id="orderId"
+                    className="form-control"
+                    value={orderId} 
+                    onChange={e=>setOrderId(e.target.value)} 
+                    required
+                    placeholder="Enter unique order ID"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label required" htmlFor="address">Delivery Address</label>
+                  <input 
+                    id="address"
+                    className="form-control"
+                    value={address} 
+                    onChange={e=>setAddress(e.target.value)} 
+                    required
+                    placeholder="Full delivery address"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label required" htmlFor="latitude">Latitude</label>
+                  <input 
+                    id="latitude"
+                    className="form-control"
+                    type="number" 
+                    step="any" 
+                    value={latitude} 
+                    onChange={e=>setLat(e.target.value)} 
+                    required
+                    placeholder="6.9271"
+                  />
+                  <div className="form-help">GPS coordinate for precise location</div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label required" htmlFor="longitude">Longitude</label>
+                  <input 
+                    id="longitude"
+                    className="form-control"
+                    type="number" 
+                    step="any" 
+                    value={longitude} 
+                    onChange={e=>setLng(e.target.value)} 
+                    required
+                    placeholder="79.8612"
+                  />
+                  <div className="form-help">GPS coordinate for precise location</div>
+                </div>
+
+                <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                  <label className="form-label" htmlFor="items">Package Items</label>
+                  <input 
+                    id="items"
+                    className="form-control"
+                    value={items} 
+                    onChange={e=>setItems(e.target.value)} 
+                    placeholder="PKG001,PKG002,PKG003 (comma-separated)"
+                  />
+                  <div className="form-help">
+                    Enter package IDs separated by commas
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 mt-6">
+                <button 
+                  type="submit" 
+                  className={`btn btn-primary ${loading ? 'opacity-75' : ''}`}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className="loading"></span>
+                      Processing Order...
+                    </>
+                  ) : (
+                    <>
+                      🚀 Submit Order
+                    </>
+                  )}
+                </button>
+                
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    setOrderId('ORD' + Math.floor(Math.random()*1000))
+                    setAddress('123 Main Street, Colombo')
+                    setLat(6.9271)
+                    setLng(79.8612)
+                    setItems('PKG001,PKG002')
+                    setResult(null)
+                    setError('')
+                  }}
+                  className="btn btn-secondary"
+                  disabled={loading}
+                >
+                  🔄 Reset Form
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
 
       {/* Error Display */}
       {error && (
-        <div className="alert alert-error">
+        <div className="alert alert-error mb-6">
           <strong>❌ Submission Failed:</strong> {error}
         </div>
       )}
 
       {/* Success Result */}
       {result && (
-        <div className="card" style={{
-          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-          color: 'white',
-          border: 'none',
-          marginTop: '2rem'
-        }}>
-          <div className="card-header">
-            <h3 className="card-title" style={{color: 'white', margin: 0}}>
-              ✅ Order Submitted Successfully
-            </h3>
-          </div>
-          <div className="card-content">
-            <div className="grid" style={{color: 'rgba(255,255,255,0.9)'}}>
-              <div>
-                <div className="text-sm opacity-80">Order Status</div>
-                <div className="font-semibold text-lg">{result.status.toUpperCase()}</div>
-              </div>
-              <div>
-                <div className="text-sm opacity-80">Order ID</div>
-                <div className="font-semibold text-lg">{result.orderId || orderId}</div>
-              </div>
-              <div style={{gridColumn: '1 / -1'}}>
-                <div className="text-sm opacity-80">Tracking Information</div>
-                <div className="font-semibold">
-                  Track your order: <code style={{background: 'rgba(255,255,255,0.2)', padding: '0.25rem 0.5rem', borderRadius: '0.25rem'}}>{result.track}</code>
+        <section className="mb-6">
+          <div className="card success-card">
+            <div className="card-header">
+              <h3 className="card-title text-white">
+                ✅ Order Submitted Successfully
+              </h3>
+            </div>
+            <div className="card-content">
+              <div className="grid text-white">
+                <div>
+                  <div className="text-sm opacity-80">Order Status</div>
+                  <div className="font-semibold text-lg">{result.status.toUpperCase()}</div>
                 </div>
-              </div>
-              {result.timestamp && (
+                <div>
+                  <div className="text-sm opacity-80">Order ID</div>
+                  <div className="font-semibold text-lg">{result.orderId || orderId}</div>
+                </div>
                 <div style={{gridColumn: '1 / -1'}}>
-                  <div className="text-sm opacity-80">Submitted At</div>
-                  <div className="font-medium">{new Date(result.timestamp).toLocaleString()}</div>
+                  <div className="text-sm opacity-80 mb-2">Tracking Information</div>
+                  <div className="font-semibold">
+                    Track your order: <code className="bg-secondary p-2 rounded text-primary">{result.track}</code>
+                  </div>
                 </div>
-              )}
-            </div>
-            <div className="mt-4">
-              <a 
-                href={`/tracking`} 
-                className="btn" 
-                style={{background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)'}}
-              >
-                🔍 Track This Order
-              </a>
+                {result.timestamp && (
+                  <div style={{gridColumn: '1 / -1'}}>
+                    <div className="text-sm opacity-80">Submitted At</div>
+                    <div className="font-medium">{new Date(result.timestamp).toLocaleString()}</div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-4">
+                <a 
+                  href={`/tracking`} 
+                  className="btn btn-outline-light"
+                >
+                  🔍 Track This Order
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Help Information */}
-      <div className="card mt-6">
-        <div className="card-header">
-          <h3 className="card-title">📋 Order Submission Guide</h3>
-        </div>
-        <div className="card-content text-sm text-gray-600">
-          <div className="grid gap-4">
-            <div>
-              <strong className="text-gray-800">🆔 Order ID:</strong> Must be unique. Auto-generated but customizable.
-            </div>
-            <div>
-              <strong className="text-gray-800">📍 Location:</strong> Provide precise latitude/longitude for accurate delivery routing.
-            </div>
-            <div>
-              <strong className="text-gray-800">📦 Packages:</strong> List all package IDs separated by commas.
-            </div>
-            <div>
-              <strong className="text-gray-800">⚡ Processing:</strong> Orders are processed immediately and integrated with our route optimization system.
+      <section>
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title">📋 Order Submission Guide</h3>
+          </div>
+          <div className="card-content">
+            <div className="grid gap-4 text-sm">
+              <div>
+                <strong className="text-primary">🆔 Order ID:</strong> 
+                <span className="text-muted ml-2">Must be unique. Auto-generated but customizable.</span>
+              </div>
+              <div>
+                <strong className="text-primary">📍 Location:</strong> 
+                <span className="text-muted ml-2">Provide precise latitude/longitude for accurate delivery routing.</span>
+              </div>
+              <div>
+                <strong className="text-primary">📦 Packages:</strong> 
+                <span className="text-muted ml-2">List all package IDs separated by commas.</span>
+              </div>
+              <div>
+                <strong className="text-primary">⚡ Processing:</strong> 
+                <span className="text-muted ml-2">Orders are processed immediately and integrated with our route optimization system.</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }

@@ -15,16 +15,6 @@ function Layout({ children }) {
   
   const isActive = (path) => location.pathname === path
   
-  const getNavIcon = (type) => {
-    const icons = {
-      dashboard: '📊',
-      orders: '📦',
-      tracking: '🚛',
-      driver: '👨‍💼'
-    }
-    return icons[type] || '•'
-  }
-  
   return (
     <div className="container">
       <header>
@@ -42,25 +32,25 @@ function Layout({ children }) {
               to="/dashboard" 
               className={isActive('/dashboard') ? 'active' : ''}
             >
-              {getNavIcon('dashboard')} Dashboard
+              Dashboard
             </Link>
             <Link 
               to="/orders" 
               className={isActive('/orders') ? 'active' : ''}
             >
-              {getNavIcon('orders')} Orders
+              Orders
             </Link>
             <Link 
               to="/tracking" 
               className={isActive('/tracking') ? 'active' : ''}
             >
-              {getNavIcon('tracking')} Tracking
+              Tracking
             </Link>
             <Link 
               to="/driver" 
               className={isActive('/driver') ? 'active' : ''}
             >
-              {getNavIcon('driver')} Driver
+              Driver
             </Link>
           </nav>
           
