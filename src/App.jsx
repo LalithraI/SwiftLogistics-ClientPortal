@@ -6,7 +6,7 @@ import Tracking from './pages/Tracking'
 import Dashboard from './pages/Dashboard'
 import DriverManifest from './pages/DriverManifest'
 import { getClientId } from './lib/api'
-import BackendStatus from './components/BackendStatus'
+import Status from './components/Status'
 
 function Layout({ children }) {
   const navigate = useNavigate()
