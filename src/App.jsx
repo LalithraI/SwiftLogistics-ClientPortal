@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import Login from './pages/Login'
 import Orders from './pages/Orders'
 import Tracking from './pages/Tracking'
@@ -10,31 +10,88 @@ import BackendStatus from './components/BackendStatus'
 
 function Layout({ children }) {
   const navigate = useNavigate()
+  const location = useLocation()
   const clientId = getClientId()
+  
+  const isActive = (path) => location.pathname === path
+  
+  const getNavIcon = (type) => {
+    const icons = {
+      dashboard: '📊',
+      orders: '📦',
+      tracking: '🚛',
+      driver: '👨‍💼'
+    }
+    return icons[type] || '•'
+  }
+  
   return (
     <div className="container">
       <header>
-        <h1>SwiftTrack Client Portal</h1>
-        <nav>
-          <Link to="/dashboard">Dashboard</Link>
-          <Link to="/orders">Orders</Link>
-          <Link to="/tracking">Tracking</Link>
-          <Link to="/driver">Driver</Link>
-        </nav>
-        <div className="auth">
-          <BackendStatus />
-          {clientId ? (
-            <>
-              <span>Client: <b>{clientId}</b></span>
-              <button onClick={() => { localStorage.removeItem('clientId'); navigate('/login') }}>Logout</button>
-            </>
-          ) : (
-            <Link to="/login">Login</Link>
-          )}
+        <div className="header-content">
+          <div className="logo-section">
+            <div className="logo-icon">ST</div>
+            <div>
+              <h1>SwiftTrack</h1>
+              <div className="subtitle">Professional Logistics Platform</div>
+            </div>
+          </div>
+          
+          <nav>
+            <Link 
+              to="/dashboard" 
+              className={isActive('/dashboard') ? 'active' : ''}
+            >
+              {getNavIcon('dashboard')} Dashboard
+            </Link>
+            <Link 
+              to="/orders" 
+              className={isActive('/orders') ? 'active' : ''}
+            >
+              {getNavIcon('orders')} Orders
+            </Link>
+            <Link 
+              to="/tracking" 
+              className={isActive('/tracking') ? 'active' : ''}
+            >
+              {getNavIcon('tracking')} Tracking
+            </Link>
+            <Link 
+              to="/driver" 
+              className={isActive('/driver') ? 'active' : ''}
+            >
+              {getNavIcon('driver')} Driver
+            </Link>
+          </nav>
+          
+          <div className="auth">
+            <BackendStatus />
+            {clientId ? (
+              <div className="user-info">
+                <div className="user-avatar">{clientId.charAt(0).toUpperCase()}</div>
+                <div>
+                  <div className="text-sm font-medium">{clientId}</div>
+                  <button 
+                    className="btn-secondary text-xs" 
+                    onClick={() => { localStorage.removeItem('clientId'); navigate('/login') }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login" className="btn btn-primary">Login</Link>
+            )}
+          </div>
         </div>
       </header>
       <main>{children}</main>
-      <footer>© {new Date().getFullYear()} SwiftTrack</footer>
+      <footer>
+        <div>© {new Date().getFullYear()} SwiftTrack Logistics Platform</div>
+        <div className="text-xs text-gray-500 mt-2">
+          Connecting businesses with reliable delivery solutions
+        </div>
+      </footer>
     </div>
   )
 }
