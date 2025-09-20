@@ -3,40 +3,76 @@ import React, { useEffect, useState } from 'react'
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
 
 export default function BackendStatus() {
-  const [ok, setOk] = useState(null)
-  const [msg, setMsg] = useState('Checking...')
+  const [status, setStatus] = useState({ ok: null, msg: 'Initializing...', lastCheck: null })
+  const [isChecking, setIsChecking] = useState(false)
 
   async function check() {
-    setMsg('Checking...')
+    if (isChecking) return
+    
+    setIsChecking(true)
+    setStatus(prev => ({ ...prev, msg: 'Checking connection...' }))
+    
     try {
-      const res = await fetch(`${API_BASE}/health`)
+      const startTime = Date.now()
+      const res = await fetch(`${API_BASE}/health`, { 
+        method: 'GET',
+        timeout: 5000 
+      })
+      const responseTime = Date.now() - startTime
+      
       if (res.ok) {
-        setOk(true)
-        setMsg('Backend: OK')
+        const data = await res.json()
+        setStatus({
+          ok: true,
+          msg: `Connected • ${responseTime}ms`,
+          lastCheck: new Date(),
+          service: data.service
+        })
       } else {
-        setOk(false)
-        setMsg('Backend: Unreachable')
+        throw new Error(`HTTP ${res.status}`)
       }
     } catch (e) {
-      setOk(false)
-      setMsg('Backend: Unreachable')
+      setStatus({
+        ok: false,
+        msg: 'Connection failed',
+        lastCheck: new Date(),
+        error: e.message
+      })
+    } finally {
+      setIsChecking(false)
     }
   }
 
-  useEffect(() => { check() }, [])
+  useEffect(() => {
+    check()
+    const interval = setInterval(check, 30000) // Check every 30 seconds
+    return () => clearInterval(interval)
+  }, [])
 
-  const dotStyle = {
-    display: 'inline-block',
-    width: 10,
-    height: 10,
-    borderRadius: '50%',
-    marginRight: 6,
-    background: ok == null ? '#999' : ok ? '#0a0' : '#c00'
+  const getStatusClass = () => {
+    if (status.ok === null) return 'status status-info'
+    return status.ok ? 'status status-success' : 'status status-danger'
+  }
+
+  const getStatusIcon = () => {
+    if (isChecking) return '⟳'
+    if (status.ok === null) return '○'
+    return status.ok ? '●' : '●'
   }
 
   return (
-    <span title="Click to re-check" style={{cursor:'pointer'}} onClick={check}>
-      <span style={dotStyle} /> {msg}
-    </span>
+    <div 
+      className={getStatusClass()}
+      title={`Click to refresh • Last check: ${status.lastCheck?.toLocaleTimeString() || 'Never'}`}
+      style={{ cursor: 'pointer', userSelect: 'none' }}
+      onClick={check}
+    >
+      <span className={`status-dot ${isChecking ? 'loading' : ''}`}>
+        {getStatusIcon()}
+      </span>
+      <span className="text-xs font-medium">
+        {status.msg}
+      </span>
+    </div>
   )
 }

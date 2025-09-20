@@ -1,135 +1,176 @@
 import React, { useState, useEffect } from 'react'
 import { getClientId } from '../lib/api'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
-
 export default function DriverManifest() {
-  const [manifest, setManifest] = useState(null)
-  const [deliveries, setDeliveries] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const clientId = getClientId()
+  const [loading, setLoading] = useState(false)
+  const [manifest, setManifest] = useState(null)
 
-  async function loadManifest() {
-    if (!clientId) return
-    setLoading(true)
-    setError('')
-    try {
-      // Mock driver manifest - in real implementation, this would be a dedicated endpoint
-      const mockManifest = {
-        driverId: `DRIVER_${clientId}`,
-        vehicleId: 'VH001',
-        date: new Date().toDateString(),
-        totalDeliveries: 3,
-        estimatedDistance: '45.2 km',
-        estimatedTime: '4.5 hours',
-        route: [
-          { orderId: 'ORD001', address: '123 Main St, Colombo', status: 'pending', priority: 'high' },
-          { orderId: 'ORD002', address: '456 Park Ave, Galle', status: 'pending', priority: 'normal' },
-          { orderId: 'ORD003', address: '789 Sea View, Kandy', status: 'pending', priority: 'normal' }
-        ]
-      }
-      setManifest(mockManifest)
-      setDeliveries(mockManifest.route)
-    } catch (e) {
-      setError(e.message)
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (clientId) {
+      setLoading(true)
+      // Simulate loading delivery manifest
+      setTimeout(() => {
+        setManifest({
+          driverId: `DRIVER_${clientId}`,
+          vehicleId: 'VH001',
+          date: new Date().toLocaleDateString(),
+          deliveries: [
+            { orderId: 'ORD001', address: 'Colombo 03', status: 'delivered', priority: 'high' },
+            { orderId: 'ORD002', address: 'Galle Road', status: 'delivered', priority: 'normal' },
+            { orderId: 'ORD003', address: 'Kandy City', status: 'pending', priority: 'high' },
+            { orderId: 'ORD004', address: 'Nugegoda', status: 'pending', priority: 'normal' }
+          ]
+        })
+        setLoading(false)
+      }, 1000)
     }
-  }
-
-  async function updateDeliveryStatus(orderId, status, reason = '') {
-    try {
-      setDeliveries(prev => prev.map(d => 
-        d.orderId === orderId 
-          ? { ...d, status, reason, completedAt: status === 'delivered' ? new Date().toLocaleTimeString() : null }
-          : d
-      ))
-      
-      // In real implementation, this would update the backend
-      console.log(`Updated ${orderId} to ${status}`, reason ? `Reason: ${reason}` : '')
-    } catch (e) {
-      setError(e.message)
-    }
-  }
-
-  useEffect(() => { loadManifest() }, [clientId])
-
-  if (!clientId) {
-    return (
-      <section>
-        <h2>Driver Manifest</h2>
-        <p>Please login first to view your delivery manifest.</p>
-      </section>
-    )
-  }
+  }, [clientId])
 
   return (
-    <section>
-      <h2>Driver Manifest</h2>
-      <button onClick={loadManifest} disabled={loading}>
-        {loading ? 'Loading...' : 'Refresh Manifest'}
-      </button>
-      
-      {error && <p className="error">{error}</p>}
-      
-      {manifest && (
-        <div className="card">
-          <p><b>Driver:</b> {manifest.driverId}</p>
-          <p><b>Vehicle:</b> {manifest.vehicleId}</p>
-          <p><b>Date:</b> {manifest.date}</p>
-          <p><b>Total Deliveries:</b> {manifest.totalDeliveries}</p>
-          <p><b>Estimated Distance:</b> {manifest.estimatedDistance}</p>
-          <p><b>Estimated Time:</b> {manifest.estimatedTime}</p>
+    <div className="container">
+      <section className="mb-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-primary">Driver Manifest</h1>
+          <p className="text-muted mt-2">Your daily delivery schedule and route information</p>
         </div>
-      )}
+        
+        {loading && (
+          <div className="card">
+            <div className="card-content">
+              <div className="flex items-center justify-center gap-3 p-6">
+                <span className="loading"></span>
+                <span className="text-muted">Loading your delivery manifest...</span>
+              </div>
+            </div>
+          </div>
+        )}
 
-      {deliveries.length > 0 && (
-        <div>
-          <h3>Delivery Route</h3>
-          {deliveries.map((delivery, index) => (
-            <div key={delivery.orderId} className="card">
-              <div className="row">
-                <div style={{flex: 1}}>
-                  <p><b>#{index + 1} - {delivery.orderId}</b> 
-                    {delivery.priority === 'high' && <span style={{color: 'red', marginLeft: 8}}>HIGH PRIORITY</span>}
-                  </p>
-                  <p>{delivery.address}</p>
-                  <p><b>Status:</b> {delivery.status}</p>
-                  {delivery.completedAt && <p><b>Completed:</b> {delivery.completedAt}</p>}
-                  {delivery.reason && <p><b>Reason:</b> {delivery.reason}</p>}
-                </div>
-                <div>
-                  {delivery.status === 'pending' && (
-                    <>
-                      <button onClick={() => updateDeliveryStatus(delivery.orderId, 'delivered')}>
-                        Mark Delivered
-                      </button>
-                      <button onClick={() => {
-                        const reason = prompt('Reason for failed delivery:')
-                        if (reason) updateDeliveryStatus(delivery.orderId, 'failed', reason)
-                      }}>
-                        Mark Failed
-                      </button>
-                    </>
-                  )}
-                  {delivery.status === 'delivered' && <span style={{color: 'green'}}>✓ Delivered</span>}
-                  {delivery.status === 'failed' && <span style={{color: 'red'}}>✗ Failed</span>}
+        {clientId && manifest && (
+          <div className="space-y-6">
+            {/* Driver Info Card */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">👨‍💼 Driver Information</h3>
+              </div>
+              <div className="card-content">
+                <div className="grid">
+                  <div className="space-y-2">
+                    <div><strong className="text-primary">Driver ID:</strong> <span className="font-mono">{manifest.driverId}</span></div>
+                    <div><strong className="text-primary">Vehicle:</strong> {manifest.vehicleId}</div>
+                    <div><strong className="text-primary">Date:</strong> {manifest.date}</div>
+                  </div>
+                  <div className="space-y-2">
+                    <div><strong className="text-primary">Total Deliveries:</strong> <span className="font-semibold">{manifest.deliveries.length}</span></div>
+                    <div><strong className="text-success">Completed:</strong> <span className="font-semibold">{manifest.deliveries.filter(d => d.status === 'delivered').length}</span></div>
+                    <div><strong className="text-warning">Remaining:</strong> <span className="font-semibold">{manifest.deliveries.filter(d => d.status === 'pending').length}</span></div>
+                  </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      <div className="card" style={{marginTop: 16, background: '#f0f8ff'}}>
-        <h4>Driver Features (Demo)</h4>
-        <p>• View optimized delivery route</p>
-        <p>• Mark packages as delivered/failed</p>
-        <p>• Real-time status updates</p>
-        <p>• High-priority delivery alerts</p>
-        <p>• Digital proof of delivery (would integrate camera/signature)</p>
-      </div>
-    </section>
+            {/* Delivery List */}
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">📦 Today's Deliveries</h3>
+              </div>
+              <div className="card-content">
+                <div className="space-y-3">
+                  {manifest.deliveries.map((delivery, index) => (
+                    <div key={delivery.orderId} className="flex items-center justify-between p-4 bg-secondary rounded-lg hover:shadow transition">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                          delivery.status === 'delivered' ? 'bg-success' : 'bg-warning'
+                        }`}>
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium text-primary">{delivery.orderId}</div>
+                          <div className="text-sm text-muted">📍 {delivery.address}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`status ${delivery.status === 'delivered' ? 'status-success' : 'status-warning'}`}>
+                          <span className="status-dot"></span>
+                          {delivery.status}
+                        </span>
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${
+                          delivery.priority === 'high' ? 'bg-danger-bg text-danger' : 'bg-info-bg text-info'
+                        }`}>
+                          {delivery.priority}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {clientId && !manifest && !loading && (
+          <div className="card">
+            <div className="card-content text-center p-8">
+              <div className="text-4xl mb-4">📭</div>
+              <h3 className="text-lg font-semibold text-primary mb-2">No Deliveries Today</h3>
+              <p className="text-muted">You have no scheduled deliveries for today.</p>
+            </div>
+          </div>
+        )}
+
+        {!clientId && (
+          <div className="space-y-6">
+            <div className="alert alert-info">
+              <strong>👋 Welcome Driver!</strong> Please log in to view your delivery manifest.
+            </div>
+            
+            <div className="card">
+              <div className="card-header">
+                <h3 className="card-title">🚛 Driver Features</h3>
+              </div>
+              <div className="card-content">
+                <div className="space-y-4 text-sm">
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary">📋</span>
+                    <div>
+                      <strong className="text-primary">Daily Manifest:</strong>
+                      <div className="text-muted">View your complete delivery schedule</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary">📍</span>
+                    <div>
+                      <strong className="text-primary">Route Optimization:</strong>
+                      <div className="text-muted">Deliveries organized by location</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary">📱</span>
+                    <div>
+                      <strong className="text-primary">Mobile Friendly:</strong>
+                      <div className="text-muted">Easy access from your mobile device</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary">✅</span>
+                    <div>
+                      <strong className="text-primary">Status Updates:</strong>
+                      <div className="text-muted">Mark deliveries as completed</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-primary">🔔</span>
+                    <div>
+                      <strong className="text-primary">Priority Alerts:</strong>
+                      <div className="text-muted">High-priority deliveries highlighted</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
   )
 }
