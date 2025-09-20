@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
 
 export default function BackendStatus() {
   const [status, setStatus] = useState({ ok: null, msg: 'Initializing...', lastCheck: null })

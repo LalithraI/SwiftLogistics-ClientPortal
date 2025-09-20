@@ -103,6 +103,12 @@ export default function Dashboard() {
           </div>
           <div className="card-content">
             <div className="flex flex-wrap gap-3">
+              <a 
+                href="http://localhost:8080/realms/swiftlogistics/protocol/openid-connect/auth?client_id=kong-gateway&redirect_uri=http://localhost:5173&response_type=code&scope=openid" 
+                className="btn btn-success"
+              >
+                🔐 Login
+              </a>
               <a href="/orders" className="btn btn-primary">
                 Create New Order
               </a>
